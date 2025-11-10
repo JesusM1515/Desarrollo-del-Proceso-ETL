@@ -1,0 +1,6 @@
+@ExtraerComentarios_HostAddress = http://localhost:5152
+
+GET {{ExtraerComentarios_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
