@@ -6,37 +6,27 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Base
 {
-    public class OperationResult
+    public class OperationResult<T>
     {
         public bool IsSuccess { get; }
         public string Message { get; set; } = string.Empty;
-        public dynamic? Data { get; set; }
+        public T? Data { get; set; }
 
-        public OperationResult() 
-        { 
-        
-        }
-
-        public OperationResult(bool isSuccess, string message, dynamic? data = null)
+        public OperationResult(bool isSuccess, string message, T? data)
         {
             IsSuccess = isSuccess;
             Message = message;
             Data = data;
         }
 
-        public static OperationResult Success(string message, dynamic? data = null)
+        public static OperationResult<T> Success(string message, T? data)
         {
-            return new OperationResult(true, message, data);
+            return new OperationResult<T>(true, message, data);
         }
 
-        public static OperationResult Failure (string message)
+        public static OperationResult<T> Failure (string message)
         {
-            return new OperationResult(false, message);
-        }
-
-        public static OperationResult Failure(string message, Exception ex)
-        {
-            return new OperationResult (false, message, ex.ToString());
+            return new OperationResult<T>(false, message, default);
         }
     }
 }

@@ -19,5 +19,10 @@ namespace Domain.Entities.CSV
         public string ClasificacionRaw { get; set; } = string.Empty;
         public int PuntajeSatisfaccion { get; set; }
         public string Fuente { get; set; } = string.Empty;
+
+        public override string ToString()
+        {
+            return $"OpinionId: {ID_Opiniones}, ClienteId: {FK_Clientes}, ProductoId: {FK_Producto}, Fecha: {FechaCarga}, Clasificación: {ClasificacionRaw}, Puntaje: {PuntajeSatisfaccion}, Fuente: {Fuente}, Comentario: {Comentario}";
+        }
     }
 }

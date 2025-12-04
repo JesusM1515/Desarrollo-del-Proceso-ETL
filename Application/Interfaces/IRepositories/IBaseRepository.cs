@@ -1,5 +1,4 @@
-﻿using Domain.Entities.DB;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces.IRepositories
 {
-    public interface IWebReviewsRepository
+    public interface IBaseRepository<TEntity> where TEntity : class
     {
-        public Task<IEnumerable<EWebReviews>> GetAsync();
+        Task<IEnumerable<TEntity>> GetAllDataAsync();
     }
 }

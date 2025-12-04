@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infraestructure.BD
+namespace Infraestructure.Repositories.BD
 {
-    internal class Context
+    public class BDRepository
     {
+
     }
 }

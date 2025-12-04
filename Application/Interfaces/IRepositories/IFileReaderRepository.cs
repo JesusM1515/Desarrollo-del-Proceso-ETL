@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CsvHelper.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Application.Interfaces.IRepositories
 {
     public interface IFileReaderRepository <TClass> where TClass : class
     {
-       public Task<IEnumerable<TClass>> ReadFileAsync(string filepath);
+       public Task<IEnumerable<TClass>> ReadFileAsync(string filepath, ClassMap classMap);
 
     }
 }

@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
-namespace Domain.Entities.API
+namespace Application.DTO
 {
-    public class ESocialComments
+    public class SocialCommentsDTO
     {
-        [Key]
         public int IdComment { get; set; }
         public int IdCliente { get; set; }
         public int IdProducto { get; set; }
         public string Fuente { get; set; } = string.Empty;
-        public DateTime Fecha {  get; set; }
+        public DateTime Fecha { get; set; }
         public string Comentario { get; set; } = string.Empty;
     }
 }

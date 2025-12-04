@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Base;
+using Domain.Entities.CSV;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Application.Interfaces
 {
     public interface ISurveys
     {
-        public Task<OperationResult> GetSurveysAsync();
+        public Task<OperationResult<IEnumerable<ESurveys>>> GetSurveysAllAsync();
     }
 }
