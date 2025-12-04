@@ -9,6 +9,6 @@ namespace Application.Interfaces
 {
     public interface IDWHHandlerServices
     {
-        Task LoadDataWarehouseAsync(DimSourceDataDTO sourceData);
+        Task LoadDataWarehouseAsync();
     }
 }

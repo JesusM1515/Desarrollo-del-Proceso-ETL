@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infraestructure.Repositories.DWH
+namespace Infraestructure.BD.Context
 {
         public class DWHContext : DbContext
         {

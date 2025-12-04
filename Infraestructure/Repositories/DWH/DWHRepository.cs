@@ -5,6 +5,7 @@ using Application.Services.CSV;
 using CsvHelper.Configuration;
 using Domain.Entities.CSV;
 using Domain.Entities.DWH.Dimensions;
+using Infraestructure.BD.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -26,21 +27,30 @@ namespace Infraestructure.Repositories.DWH
             _Logger = logger;
         }
 
-        public async Task SaveProcessedDimensionsAsync(
-            IEnumerable<Dim_Categoria> categorias,
-            IEnumerable<Dim_FuentesDatos> fuentes,
-            IEnumerable<Dim_Clientes> clientes,
-            IEnumerable<Dim_Producto> productos)
+        public async Task SaveProcessedDimensionsAsync(DimSourceDataDTO data)
         {
             _Logger.LogInformation("Intentando guardar datos de dimensiones");
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                await _context.Dim_Categoria.AddRangeAsync(categorias);
-                await _context.Dim_FuentesDatos.AddRangeAsync(fuentes);
-                await _context.Dim_Clientes.AddRangeAsync(clientes);
-                await _context.Dim_Producto.AddRangeAsync(productos);
+                if (data.Categorias != null && data.Categorias.Any())
+                    await _context.Dim_Categoria.AddRangeAsync(data.Categorias);
+
+                if (data.Fuentes != null && data.Fuentes.Any())
+                    await _context.Dim_FuentesDatos.AddRangeAsync(data.Fuentes);
+
+                if (data.Clientes != null && data.Clientes.Any())
+                    await _context.Dim_Clientes.AddRangeAsync(data.Clientes);
+
+                if (data.Productos != null && data.Productos.Any())
+                    await _context.Dim_Producto.AddRangeAsync(data.Productos);
+
+                if (data.Tiempo != null && data.Tiempo.Any())
+                    await _context.Dim_Tiempo.AddRangeAsync(data.Tiempo);
+
+                if (data.Sentimientos != null && data.Sentimientos.Any())
+                    await _context.Dim_Sentimiento.AddRangeAsync(data.Sentimientos);
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();

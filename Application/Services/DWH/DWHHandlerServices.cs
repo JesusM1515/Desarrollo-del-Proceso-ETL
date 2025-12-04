@@ -1,134 +1,122 @@
 ﻿using Application.DTO;
 using Application.Interfaces;
 using Application.Interfaces.IRepositories;
+using Application.Mapping.CSV;
 using Domain.Entities.DWH.Dimensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Application.Services.DWH
 {
-    // Nombre de la clase: DWHHandlerServices
-    public class DWHHandlerServices : IDWHHandlerServices // Asumiendo que IDWHHandlerServices es la interfaz correcta
+    public class DWHHandlerServices : IDWHHandlerServices
     {
+        private readonly IFileReaderRepository<CSVClienteDTO> _clienteReader;
+        private readonly IFileReaderRepository<CSVProductoDTO> _productoReader;
+        private readonly IFileReaderRepository<CSVFuentesDTO> _fuentesReader;
+
+        // Aquí está la clave: Inyectamos la INTERFAZ del repositorio, no el contexto.
         private readonly IDWHRepository _dwhRepository;
-        private readonly DWHContext _context;
+        private readonly IPathProvider _pathProvider;
+        private readonly ILogger<DWHHandlerServices> _logger;
 
-        private readonly ILogger<DWHHandlerServices> _Logger;
-
-        public DWHHandlerServices(IDWHRepository dwhRepository, DWHContext context, ILogger<DWHHandlerServices> logger)
+        public DWHHandlerServices(
+            IFileReaderRepository<CSVClienteDTO> clienteReader,
+            IFileReaderRepository<CSVProductoDTO> productoReader,
+            IFileReaderRepository<CSVFuentesDTO> fuentesReader,
+            IDWHRepository dwhRepository, // <--- Solo pedimos el repositorio
+            IPathProvider pathProvider,
+            ILogger<DWHHandlerServices> logger)
         {
+            _clienteReader = clienteReader;
+            _productoReader = productoReader;
+            _fuentesReader = fuentesReader;
             _dwhRepository = dwhRepository;
-            _context = context;
-            _Logger = logger;
+            _pathProvider = pathProvider;
+            _logger = logger;
         }
 
-        public async Task LoadDataWarehouseAsync(DimSourceDataDTO sourceData)
+        public async Task LoadDataWarehouseAsync()
         {
-            _Logger.LogInformation("Iniciando procesamiento ETL de Dimensiones");
+            _logger.LogInformation("Obteniendo rutas de archivos");
+            var pathClientes = _pathProvider.GetCsvClientes();
+            var pathProductos = _pathProvider.GetCsvProductos();
+            var pathFuentes = _pathProvider.GetCsvFuentes();
 
-            // Mapas en memoria de los existentes
-            var clientesExistentes = await _context.Dim_Clientes.AsNoTracking().ToDictionaryAsync(c => c.ID_Clientes, c => c.Key_Clientes);
-            var productosExistentes = await _context.Dim_Producto.AsNoTracking().ToDictionaryAsync(p => p.ID_Producto, p => p.Key_Producto);
-            var categoriasExistentes = await _context.Dim_Categoria.AsNoTracking().ToDictionaryAsync(c => c.ID_Categoria, c => c.Key_Categoria);
-            var fuentesExistentes = await _context.Dim_FuentesDatos.AsNoTracking().ToDictionaryAsync(f => f.ID_FuenteDatos, f => f.Key_FuenteDatos);
+            _logger.LogInformation("Leyendo CSVs");
+            var dtosClientes = await _clienteReader.ReadFileAsync(pathClientes, new CSVClienteMap());
+            var dtosProductos = await _productoReader.ReadFileAsync(pathProductos, new CSVProductoMap());
+            var dtosFuentes = await _fuentesReader.ReadFileAsync(pathFuentes, new CSVFuenteMap());
 
-            // Listas para las entidades a insertar
-            var nuevosClientes = new List<Dim_Clientes>();
-            var nuevosProductos = new List<Dim_Producto>();
-            var nuevasFuentes = new List<Dim_FuentesDatos>();
-            var nuevasCategorias = new List<Dim_Categoria>();
+            _logger.LogInformation("3. Transformando datos a Entidades de DWH...");
+            var entidadesParaGuardar = new DimSourceDataDTO();
 
-            //Categorías
-            foreach (var dto in sourceData.CategoriaDTO)
+            //Mapeo
+            entidadesParaGuardar.Clientes = dtosClientes.Select(c => new Dim_Clientes
             {
-                if (!categoriasExistentes.ContainsKey(dto.ID_Categoria))
-                {
-                    nuevasCategorias.Add(new Dim_Categoria
-                    {
-                        ID_Categoria = dto.ID_Categoria,
-                        Nombre = LimpiarTexto(dto.Nombre),
-                        Descripcion = LimpiarTexto(dto.Descripcion)
-                    });
-                }
-            }
+                ID_Clientes = c.ID_Clientes,
+                Nombre = c.Nombre,
+                Edad = c.Edad,
+                Email = c.Email,
+                Pais = c.Pais,
+                Ciudad = c.Ciudad,
+                Tipo = c.Tipo
+            }).ToList();
 
-            //Fuentes de Datos
-            foreach (var dto in sourceData.FuentesDTO)
+            entidadesParaGuardar.Productos = dtosProductos.Select(p => new Dim_Producto
             {
-                if (!fuentesExistentes.ContainsKey(dto.ID_FuenteDatos))
-                {
-                    string nombreFuente = !string.IsNullOrWhiteSpace(dto.NombreFuenteDatos) ? LimpiarTexto(dto.NombreFuenteDatos) : $"Fuente {dto.ID_FuenteDatos}";
+                ID_Producto = p.ID_Producto,
+                Nombre = p.Nombre,
+                Marca = p.Marca,
+                Precio = p.Precio,
+                FK_Categoria = p.FK_Categoria
+            }).ToList();
 
-                    nuevasFuentes.Add(new Dim_FuentesDatos
-                    {
-                        ID_FuenteDatos = dto.ID_FuenteDatos,
-                        TipoFuenteDatos = dto.TipoFuenteDatos,
-                        NombreFuenteDatos = nombreFuente,
-                        Plataforma = dto.Plataforma, // Usa valor por defecto del DTO
-                    });
-                }
-            }
-
-            //Clientes
-            var clientesUnicos = sourceData.ClienteDTOs
-                .Where(c => !string.IsNullOrWhiteSpace(c.Email))
-                .GroupBy(c => c.Email.ToLower().Trim())
-                .Select(g => g.First());
-
-            foreach (var dto in clientesUnicos)
+            entidadesParaGuardar.Fuentes = dtosFuentes.Select(f => new Dim_FuentesDatos
             {
-                if (!clientesExistentes.ContainsKey(dto.ID_Clientes))
-                {
-                    string nombreNorm = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(LimpiarTexto(dto.Nombre).ToLower());
+                ID_FuenteDatos = f.ID_FuenteDatos,
+                NombreFuenteDatos = f.NombreFuenteDatos,
+                TipoFuenteDatos = f.TipoFuenteDatos,
+                Plataforma = f.Plataforma
+            }).ToList();
 
-                    nuevosClientes.Add(new Dim_Clientes
-                    {
-                        ID_Clientes = dto.ID_Clientes,
-                        Nombre = nombreNorm,
-                        Email = dto.Email.ToLower().Trim(), // Normalización Email
-                        Edad = dto.Edad, // Usa valor por defecto del DTO (0) si no vino en CSV
-                        Pais = LimpiarTexto(dto.Pais),
-                        Ciudad = LimpiarTexto(dto.Ciudad),
-                        Tipo = dto.Tipo
-                    });
-                }
-            }
+            // Generar dimensiones estáticas
+            entidadesParaGuardar.Tiempo = GenerarTiempo(new DateTime(2023, 1, 1), new DateTime(2025, 12, 31));
+            entidadesParaGuardar.Sentimientos = new List<Dim_Sentimiento>
+        {
+            new Dim_Sentimiento { ID_Sentimiento = 1, Clasificacion = "Positivo" },
+            new Dim_Sentimiento { ID_Sentimiento = 2, Clasificacion = "Negativo" }
+        };
 
-            //Productos
-            foreach (var dto in sourceData.ProductoDTO)
-            {
-                bool categoriaExiste = categoriasExistentes.ContainsKey(dto.FK_Categoria) || nuevasCategorias.Any(c => c.ID_Categoria == dto.FK_Categoria);
+            _logger.LogInformation("Enviando  al Repositorio");
 
-                if (!productosExistentes.ContainsKey(dto.ID_Producto) && categoriaExiste)
-                {
-                    nuevosProductos.Add(new Dim_Producto
-                    {
-                        ID_Producto = dto.ID_Producto,
-                        Nombre = LimpiarTexto(dto.Nombre),
-                        FK_Categoria = dto.FK_Categoria,
-                        Marca = dto.Marca,
-                        Precio = dto.Precio,
-                    });
-                }
-            }
-
-            //Escribir dimensiones (usando el Repositorio)
-            await _dwhRepository.SaveProcessedDimensionsAsync(
-                nuevasCategorias,
-                nuevasFuentes,
-                nuevosClientes,
-                nuevosProductos);
-
-            _Logger.LogInformation("Carga de dimensiones finalizada correctamente");
+            // AQUÍ es donde delegamos. El servicio dice: "Toma estos datos y guárdalos, no me importa cómo".
+            await _dwhRepository.SaveProcessedDimensionsAsync(entidadesParaGuardar); //aqui esta el error
         }
 
-        private string LimpiarTexto(string input)
+        // Metodo para logica de fechas
+        private List<Dim_Tiempo> GenerarTiempo(DateTime inicio, DateTime fin)
         {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
-            string limpio = Regex.Replace(input, @"[^\w\s\.\-@áéíóúÁÉÍÓÚñÑ]", "");
-            return limpio.Trim();
+            var lista = new List<Dim_Tiempo>();
+            for (var dia = inicio; dia <= fin; dia = dia.AddDays(1))
+            {
+                lista.Add(new Dim_Tiempo
+                {
+                    ID_Tiempo = int.Parse(dia.ToString("yyyyMMdd")),
+                    Fecha = dia,
+                    Anio = dia.Year,
+                    Mes = dia.Month.ToString(),
+                    Dia = dia.Day.ToString(),
+                    Trimestres = (dia.Month - 1) / 3 + 1
+                });
+            }
+            return lista;
         }
     }
 }

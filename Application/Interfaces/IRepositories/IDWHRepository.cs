@@ -10,10 +10,6 @@ namespace Application.Interfaces.IRepositories
 {
     public interface IDWHRepository
     {
-        Task SaveProcessedDimensionsAsync(
-        IEnumerable<Dim_Categoria> categorias,
-        IEnumerable<Dim_FuentesDatos> fuentes,
-        IEnumerable<Dim_Clientes> clientes,
-        IEnumerable<Dim_Producto> productos);
+        Task SaveProcessedDimensionsAsync(DimSourceDataDTO data);
     }
 }
