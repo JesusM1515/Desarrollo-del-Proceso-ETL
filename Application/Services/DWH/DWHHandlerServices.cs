@@ -33,7 +33,6 @@ namespace Application.Services.DWH
             _logger = logger;
         }
 
-        //public async Task LoadDataWarehouseAsync()
         public async Task<OperationResult<DimSourceDataDTO>> LoadDataWarehouseAsync()
         {
             _logger.LogInformation("Obteniendo rutas de archivos");
@@ -53,7 +52,6 @@ namespace Application.Services.DWH
             var entidadesParaGuardar = new DimSourceDataDTO();
 
             //Mapeo
-            //Actualizado
             entidadesParaGuardar.Clientes = dtosClientes.Select(c => new Dim_Clientes
             {
                 ID_Clientes = c.ID_Clientes,
@@ -65,7 +63,6 @@ namespace Application.Services.DWH
                 Tipo = c.Tipo
             }).ToList();
 
-            //Actualizado
             entidadesParaGuardar.Productos = dtosProductos.Select(p => new Dim_Producto
             {
                 ID_Producto = p.ID_Producto,
@@ -75,15 +72,6 @@ namespace Application.Services.DWH
                 Categoria = p.Categoria
             }).ToList();
 
-            /*Actualizado (Potencialmente eliminado)
-            entidadesParaGuardar.Productos = dtosProductos.Select(p => new Dim_Categoria
-            {
-                ID_Categoria = p.ID_Producto,
-                Nombre = p.Nombre,
-                Descripcion = "Descripcion pendiente"
-            }).ToList(); */
-
-            //Actualizado
             entidadesParaGuardar.Fuentes = dtosFuentes.Select(f => new Dim_FuentesDatos
             {
                 ID_FuenteDatos = f.ID_FuenteDatos,
@@ -96,7 +84,8 @@ namespace Application.Services.DWH
             //Generar dimensiones estaticas
             entidadesParaGuardar.Tiempo = GenerarTiempo(new DateTime(2023, 1, 1), new DateTime(2025, 12, 31));
             entidadesParaGuardar.Sentimientos = new List<Dim_Sentimiento>
-        {    //Actualizado
+        {  
+
             new Dim_Sentimiento { ID_Sentimiento = 1, Clasificacion = "Positivo" },
             new Dim_Sentimiento { ID_Sentimiento = 2, Clasificacion = "Negativo" },
             new Dim_Sentimiento { ID_Sentimiento = 3, Clasificacion = "Neutra" }

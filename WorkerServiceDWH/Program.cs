@@ -27,7 +27,6 @@ namespace WorkerServiceDWH
             builder.Services.AddSingleton<ClassMap<CSVProductoDTO>, CSVProductoMap>();
             builder.Services.AddSingleton<ClassMap<CSVFuentesDTO>, CSVFuenteMap>();
             builder.Services.AddSingleton<ClassMap<CSVClienteDTO>, CSVClienteMap>();
-            builder.Services.AddSingleton<ClassMap<CSVCategoriaDTO>, CSVCategoriaMap>();
 
             builder.Services.AddScoped(typeof(IFileReaderRepository<>), typeof(CSVRepository<>)); //type por que es generico
 

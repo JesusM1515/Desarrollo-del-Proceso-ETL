@@ -20,7 +20,6 @@ namespace Infraestructure.BD.Context
             public DbSet<Dim_Producto> Dim_Producto { get; set; }
             public DbSet<Dim_FuentesDatos> Dim_FuentesDatos { get; set; }
             public DbSet<Dim_Clientes> Dim_Clientes { get; set; }
-            public DbSet<Dim_Categoria> Dim_Categoria { get; set; }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {

@@ -23,9 +23,6 @@ namespace Infraestructure.Repositories.DWH
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-               /* if (data.Categorias != null && data.Categorias.Any())
-                    await _context.Dim_Categoria.AddRangeAsync(data.Categorias);*/
-
                 if (data.Fuentes != null && data.Fuentes.Any())
                     await _context.Dim_FuentesDatos.AddRangeAsync(data.Fuentes);
 
