@@ -1,20 +1,15 @@
-﻿using CsvHelper.Configuration;
-using Domain.Entities.DWH.Dimensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DTO;
+using CsvHelper.Configuration;
 
 namespace Application.Mapping.CSV
 {
-    public class CSVProductoMap : ClassMap<Dim_ProductoDTO>
+    public class CSVProductoMap : ClassMap<CSVProductoDTO>
     {
         public CSVProductoMap()
         {
             Map(m => m.ID_Producto).Name("IdProducto");
             Map(m => m.Nombre).Name("Nombre");
-            Map(m => m.FK_Categoria).Name("Categoría");
+            Map(m => m.Categoria).Name("Categoría");
         }
     }
 }

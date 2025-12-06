@@ -1,15 +1,9 @@
-﻿using CsvHelper.Configuration;
-using Domain.Entities.CSV;
-using Domain.Entities.DWH.Dimensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DTO;
+using CsvHelper.Configuration;
 
 namespace Application.Mapping.CSV
 {
-    public class CSVClienteMap : ClassMap<Dim_ClientesDTO>
+    public class CSVClienteMap : ClassMap<CSVClienteDTO>
     {
         public CSVClienteMap()
         {

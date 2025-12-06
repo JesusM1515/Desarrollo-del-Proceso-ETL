@@ -1,18 +1,7 @@
 ﻿using Application.DTO;
-using Application.Interfaces;
 using Application.Interfaces.IRepositories;
-using Application.Services.CSV;
-using CsvHelper.Configuration;
-using Domain.Entities.CSV;
-using Domain.Entities.DWH.Dimensions;
 using Infraestructure.BD.Context;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infraestructure.Repositories.DWH
 {
@@ -34,8 +23,8 @@ namespace Infraestructure.Repositories.DWH
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                if (data.Categorias != null && data.Categorias.Any())
-                    await _context.Dim_Categoria.AddRangeAsync(data.Categorias);
+               /* if (data.Categorias != null && data.Categorias.Any())
+                    await _context.Dim_Categoria.AddRangeAsync(data.Categorias);*/
 
                 if (data.Fuentes != null && data.Fuentes.Any())
                     await _context.Dim_FuentesDatos.AddRangeAsync(data.Fuentes);

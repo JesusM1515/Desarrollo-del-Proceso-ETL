@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Entities.DWH.Dimensions
 {
@@ -17,6 +12,6 @@ namespace Domain.Entities.DWH.Dimensions
         public string Nombre { get; set; } = string.Empty;
         public string Marca { get; set; } = string.Empty;
         public decimal Precio { get; set; }
-        public int FK_Categoria { get; set; }
+        public string Categoria { get; set; } = string.Empty;
     }
 }

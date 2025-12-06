@@ -1,4 +1,5 @@
 ﻿using Application.DTO;
+using Domain.Entities.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace Application.Interfaces
 {
     public interface IDWHHandlerServices
     {
-        Task LoadDataWarehouseAsync();
+        Task<OperationResult<DimSourceDataDTO>> LoadDataWarehouseAsync();
+
+        //Task LoadDataWarehouseAsync();
     }
 }

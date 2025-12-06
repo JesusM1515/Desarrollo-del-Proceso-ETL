@@ -11,9 +11,10 @@ namespace Domain.Entities.API
     public class ESocialComments
     {
         [Key]
-        public int IdComment { get; set; }
-        public int IdCliente { get; set; }
-        public int IdProducto { get; set; }
+        public int Key_Comment {  get; set; }
+        public string IdComment { get; set; } = string.Empty;
+        public string IdCliente { get; set; } = string.Empty;
+        public string IdProducto { get; set; } = string.Empty;
         public string Fuente { get; set; } = string.Empty;
         public DateTime Fecha {  get; set; }
         public string Comentario { get; set; } = string.Empty;
