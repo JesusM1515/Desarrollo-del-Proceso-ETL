@@ -1,9 +1,10 @@
-﻿using CsvHelper.Configuration;
+﻿using Application.DTO;
+using CsvHelper.Configuration;
 using Domain.Entities.CSV;
 
 namespace Application.Mapping.CSV
 {
-    public class CSVSurveyMap : ClassMap<ESurveys>
+    public class CSVSurveyMap : ClassMap<CSVSurveyDTO>
     {
         public CSVSurveyMap() 
         {

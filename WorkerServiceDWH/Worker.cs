@@ -32,25 +32,7 @@ namespace WorkerServiceDWH
                         }
                     }
                 
-                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
-
-                /*
-                 * using (var scope = _serviceProvider.CreateScope())
-                    {
-                        var surveysService = scope.ServiceProvider.GetRequiredService<ISurveys>();
-
-                        var resultado = await surveysService.GetSurveysAllAsync();
-
-                        if (resultado.IsSuccess)
-                        {
-                            _logger.LogInformation("Surveys procesados correctamente: {msg}", resultado.Message);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Error procesando surveys: {msg}", resultado.Message);
-                        }
-                    }
-                */
+                    await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
             }
         }
     }

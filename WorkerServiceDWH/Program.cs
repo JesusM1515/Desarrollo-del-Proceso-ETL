@@ -23,7 +23,7 @@ namespace WorkerServiceDWH
 
             builder.Services.AddScoped<ISurveys, CSVSurveysServices>();
 
-            builder.Services.AddSingleton<ClassMap<ESurveys>, CSVSurveyMap>();
+            builder.Services.AddSingleton<ClassMap<CSVSurveyDTO>, CSVSurveyMap>();
             builder.Services.AddSingleton<ClassMap<CSVProductoDTO>, CSVProductoMap>();
             builder.Services.AddSingleton<ClassMap<CSVFuentesDTO>, CSVFuenteMap>();
             builder.Services.AddSingleton<ClassMap<CSVClienteDTO>, CSVClienteMap>();

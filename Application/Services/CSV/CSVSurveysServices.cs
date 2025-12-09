@@ -1,34 +1,29 @@
-﻿using Application.Interfaces;
+﻿using Application.DTO;
+using Application.Interfaces;
 using Application.Interfaces.IRepositories;
 using CsvHelper.Configuration;
 using Domain.Entities.Base;
-using Domain.Entities.CSV;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Services.CSV
 {
     public class CSVSurveysServices : ISurveys
     {
-        private readonly IFileReaderRepository<ESurveys> _IReaderRepository; //Esta interfaz hereda del file reader
+        private readonly IFileReaderRepository<CSVSurveyDTO> _IReaderRepository; //Esta interfaz hereda del file reader
         private readonly ILogger<CSVSurveysServices> _Logger;
         private readonly IPathProvider _EsurveyPath;
-        private readonly ClassMap<ESurveys> _classMap;
+        private readonly ClassMap<CSVSurveyDTO> _classMap;
         //En el servicio se utiliza el worker service
-        public CSVSurveysServices(IFileReaderRepository<ESurveys> readerRepository, ILogger<CSVSurveysServices> logger, 
-            IPathProvider eSurveyPath, ClassMap<ESurveys> classMap) 
+        public CSVSurveysServices(IFileReaderRepository<CSVSurveyDTO> readerRepository, ILogger<CSVSurveysServices> logger, 
+            IPathProvider eSurveyPath, ClassMap<CSVSurveyDTO> classMap) 
         { 
             _IReaderRepository = readerRepository;
             _Logger = logger;
             _EsurveyPath = eSurveyPath;
             _classMap = classMap;
         }
-        //<IEnumerable<ESurveys>
-        async Task<OperationResult<IEnumerable<ESurveys>>> ISurveys.GetSurveysAllAsync()
+     
+        async Task<OperationResult<IEnumerable<CSVSurveyDTO>>> ISurveys.GetSurveysAllAsync()
         {
             try
             {
@@ -39,10 +34,10 @@ namespace Application.Services.CSV
                 if (resultadoRead == null || !resultadoRead.Any())
                 {
                     _Logger.LogWarning("El archivo CSV no contiene datos o no se pudo leer correctamente");
-                    return OperationResult<IEnumerable<ESurveys>>.Failure("No se pudieron obtener los datos del CSV Surveys");
+                    return OperationResult<IEnumerable<CSVSurveyDTO>>.Failure("No se pudieron obtener los datos del CSV Surveys");
                 }
 
-                //Limpieza de duplicados y comentarios vacios revisar
+                //Limpieza de duplicados y comentarios vacios
                 var surveys = resultadoRead
                     .GroupBy(s => s.ID_Opiniones)
                     .Select(g => g.First()) //Elimina duplicados por IdOpinion
@@ -87,21 +82,21 @@ namespace Application.Services.CSV
                 _Logger.LogInformation("Total comentarios: {totalComentarios}", totalComentarios);
                 _Logger.LogInformation("Porcentaje satisfacción: {porcentajeSatisfaccion}%", porcentajeSatisfaccion);
 
-                //Verificar que si se esta leyendo el archivo csv y que los filtros funcionan sin dar problemas
+                /*Verificar que si se esta leyendo el archivo csv y que los filtros funcionan sin dar problemas
                 Console.WriteLine("");
                 _Logger.LogInformation("Registros leidos: {count}", resultadoRead.Count());
                 _Logger.LogInformation("Despues de eliminar duplicados y vacios: {count}", surveys.Count);
                 foreach (var confirmar in surveys)
                 {
                     Console.WriteLine(confirmar);
-                }
+                }*/
 
-                return OperationResult<IEnumerable<ESurveys>>.Success("Archivo CSV Surveys procesado con exito", surveys);
+                return OperationResult<IEnumerable<CSVSurveyDTO>>.Success("Archivo CSV Surveys procesado con exito", surveys);
             }
             catch (Exception ex)
             {
                 _Logger.LogError($"Error al leer el archivo CSV {ex}");
-                return OperationResult<IEnumerable<ESurveys>>.Failure($"Error al procesar el archivo CSV {ex}");
+                return OperationResult<IEnumerable<CSVSurveyDTO>>.Failure($"Error al procesar el archivo CSV {ex}");
             }
         }
     }

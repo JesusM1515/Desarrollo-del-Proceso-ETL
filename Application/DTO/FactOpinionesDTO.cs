@@ -1,13 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Domain.Entities.DWH.Facts
+﻿namespace Application.DTO
 {
-    [Table("Fact_Opiniones", Schema = "Fact")]
-    public class Fact_Opiniones
+    public class FactOpinionesDTO
     {
-        [Key]
-        public int Key_Opiniones { get; set; }
         public int ID_Opiniones { get; set; }
         public string Comentario { get; set; } = string.Empty;
         public string ClasificacionRaw { get; set; } = string.Empty;
@@ -15,9 +9,9 @@ namespace Domain.Entities.DWH.Facts
         public int PuntajeSatisfaccion { get; set; }
         public DateTime FechaCarga { get; set; }
         public int FK_Clientes { get; set; }
-        public int FK_FuenteDatos { get; set; }
         public int FK_Producto { get; set; }
-        public int FK_Sentiemiento { get; set; }
-        public int FK_Tiempo { get; set; }
+
+        //solo se usa para resolver el FK
+        public string ID_FuenteDatos { get; set; } = string.Empty;
     }
 }

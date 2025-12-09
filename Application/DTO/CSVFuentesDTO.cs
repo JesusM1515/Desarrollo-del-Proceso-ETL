@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.DTO
+﻿namespace Application.DTO
 {
     public class CSVFuentesDTO
     {
         public string ID_FuenteDatos { get; set; } = string.Empty;
         public string TipoFuenteDatos { get; set; } = string.Empty;
-        public string NombreFuenteDatos { get; set; } = "N/A"; // Faltante en CSV, valor por defecto
-        public string Plataforma { get; set; } = "N/A"; // Faltante en CSV, valor por defecto
+        public string NombreFuenteDatos { get; set; } = "N/A"; //Valor por defecto
+        public string Plataforma { get; set; } = "N/A"; //Valor por defecto
         public DateTime FechaCarga { get; set; }
     }
 }
